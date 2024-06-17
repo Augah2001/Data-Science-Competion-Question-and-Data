@@ -47,6 +47,7 @@ class Predict_ML:
         preds = self.model.predict(self.predict_values)
         return preds
 
+    
 class Predict_Job:
    
 
@@ -89,7 +90,7 @@ class Predict_Job:
         
         preds = self.model.predict(self.predict_values)
         return preds
-    
+
     
     
  
