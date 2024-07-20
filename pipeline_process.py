@@ -59,22 +59,25 @@ class DataTransformer(BaseEstimator, TransformerMixin):
         self.job_loan_index_encode = [{4: 0, 7: 1, 3: 2, 6: 3, 0: 4, 1: 5, 5: 6, 8: 7, 2: 8}]
         self.location_ratios = None
         self.threshold = threshold
+        self.isFitted = False
        
         
 
     def fit(self, X, y=None):
-        categorical_features = ['currency', 'country', 'job', 'location']
+        categorical_features = [ 'job', 'location']
 
         for cat in categorical_features:
             le = LabelEncoder()
             le.fit(X[cat])
             self.label_encoders[cat] = le
 
-        # X = self.transform(X)
-        X_features = self.features.copy()
-        X_features['y'] = self.labels
-        self.location_ratios = X_features.groupby('location')['y'].mean()
-        self.location_ratios = self.location_ratios / (1 - self.location_ratios)
+        
+        # X_features = self.transform(self.features.copy())[[ 'location']]
+        # X_features['y'] = self.labels.map({'Did not default':0, 'Defaulted':1})
+        # print(X_features)
+        # self.location_ratios = X_features.groupby('location')['y'].mean()
+        # self.location_ratios = self.location_ratios / (1 - self.location_ratios)
+     
     
        
 
@@ -90,7 +93,7 @@ class DataTransformer(BaseEstimator, TransformerMixin):
         
        
         X = X.copy()
-        categorical_features = ['currency', 'country', 'job', 'location']
+        categorical_features = [ 'job', 'location']
 
         for cat in categorical_features:
             self.label_encoders[cat].classes_ = np.append(self.label_encoders[cat].classes_, '<unknown>')
@@ -103,6 +106,7 @@ class DataTransformer(BaseEstimator, TransformerMixin):
         
            
         X['location'] = X['location'].map(self.location_loan_index_encode[0])
+        # print(X['job'])
         X['job'] = X['job'].map(self.job_loan_index_encode[0]).astype('int')
         
 
@@ -114,11 +118,11 @@ class DataTransformer(BaseEstimator, TransformerMixin):
         ### Create new feature to capture job and location relationship
         X['job_location_interact'] = np.log1p(np.sqrt(X['job']))/(X['location']+1)
 
-        
-        X['location_class'] = X['location'].map(lambda loc: 1 if self.location_ratios[loc] < self.threshold else 0)  
-        X = self.create_new_features(X)  
-        print(X.columns)
-       
+        # if self.isFitted == True:
+        #     X['location_class'] = X['location'].map(lambda loc: 1 if self.location_ratios[loc] < self.threshold else 0)  
+              
+        # print(X.columns)
+        X = self.create_new_features(X)
           
         return X
     
