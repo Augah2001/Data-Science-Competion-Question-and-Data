@@ -43,7 +43,7 @@ class Predict_Marital:
         print(f'score: {self.model.score(X_test, y_test)}')
 
         
-        return self.model
+        return self
     
     def predict(self):
 
